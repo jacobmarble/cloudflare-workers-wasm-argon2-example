@@ -1,0 +1,12 @@
+name = "cloudflare-workers-wasm-argon2-example"
+type = "javascript"
+workers_dev = true
+compatibility_date = "2022-01-01"
+
+[build]
+command = "npx webpack"
+
+[build.upload]
+format = "modules"
+dir = "./worker"
+main = "./index.mjs"
