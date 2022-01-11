@@ -10,3 +10,7 @@ command = "npx webpack"
 format = "modules"
 dir = "./worker"
 main = "./index.mjs"
+
+[[build.upload.rules]]
+globs = ["**/*.wasm"]
+type  = "CompiledWasm"

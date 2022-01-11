@@ -8,7 +8,19 @@ export async function argon2id(t, mKiB, parallelism, password, salt, hashLength)
     throw new Error('invalid arguments')
   }
   const encodedPassword = new TextEncoder().encode(password)
-  const wasmModule = await createModule()
+  const wasmModule = await createModule({
+    instantiateWasm(info, receiveInstance) {
+      const instance = new WebAssembly.Instance(wasm, info)
+      receiveInstance(instance)
+      return instance.exports
+    },
+    // locateFile(path) {
+    //   if (path.endsWith('.wasm')) {
+    //     return wasm
+    //   }
+    //   return path
+    // },
+  })
   const cEncodedHash = wasmModule._malloc(ENCODED_HASH_BUFFER_SIZE)
   const result = wasmModule.ccall(
     'argon2id_hash_encoded',

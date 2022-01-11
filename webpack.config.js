@@ -1,7 +1,9 @@
+const CopyPlugin = require('copy-webpack-plugin')
 const spawn = require('child_process').spawnSync
 
 module.exports = {
   target: ['webworker', 'es2020'],
+  devtool: 'nosources-source-map',
   entry: './src/worker.mjs',
   output: {
     filename: 'index.mjs',
@@ -33,5 +35,13 @@ module.exports = {
         })
       },
     },
+    new CopyPlugin({
+        patterns: [
+          {
+            from: './build/wasm-module.wasm',
+          },
+        ],
+      },
+    ),
   ],
 }

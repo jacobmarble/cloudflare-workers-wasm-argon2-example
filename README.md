@@ -28,11 +28,33 @@ webpack 5.65.0 compiled successfully in 7070 ms
 
 % npx wrangler dev
 ...
-webpack 5.65.0 compiled successfully in 6724 ms
-Error: Something went wrong with the request to Cloudflare...
-Uncaught Error: Automatic publicPath is not supported in this browser
-  at line 0
- [API code: 10021]
+webpack 5.65.0 compiled successfully in 6536 ms
+👂  Listening on http://127.0.0.1:8787
+```
+
+Now query the dev worker
+
+```console
+% curl http://127.0.0.1:8787 -o /dev/null -s -w "%{http_code}"
+500
+```
+
+And check the logs emitted from `wrangler dev`
+
+```console
+...
+TypeError: Invalid URL string.
+...
+```
+
+The invalid URL is the URL used to load the WASM file.
+Notice `({}).url` -- this is a replacement for `import.meta.url`.
+I use `sed` to replace this, in order to mitigate another error,
+`Automatic publicPath is not supported in this browser`.
+
+```javascript
+  // Use bundler-friendly `new URL(..., ({}).url)` pattern; works in browsers too.
+  wasmBinaryFile = new URL('wasm-module.wasm', ({}).url).toString();
 ```
 
 ## Unit Test WASM interface

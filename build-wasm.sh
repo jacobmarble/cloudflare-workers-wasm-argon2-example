@@ -32,3 +32,5 @@ docker run \
   -s TEXTDECODER=0 \
   -s VERBOSE=0 \
   -s WASM=1
+
+sed -i '' 's/import.meta/({})/g' build/wasm-module.mjs
