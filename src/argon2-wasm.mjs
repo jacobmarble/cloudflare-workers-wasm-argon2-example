@@ -2,7 +2,7 @@ import createModule from '../build/wasm-module.mjs'
 
 const ENCODED_HASH_BUFFER_SIZE = 1024
 
-export async function argon2id(t, mKiB, parallelism, password, salt, hashLength) {
+export async function argon2id(env, t, mKiB, parallelism, password, salt, hashLength) {
   // TODO support parallelism > 1 without threads
   if (typeof password !== 'string' || salt.BYTES_PER_ELEMENT !== 1) {
     throw new Error('invalid arguments')
@@ -10,13 +10,13 @@ export async function argon2id(t, mKiB, parallelism, password, salt, hashLength)
   const encodedPassword = new TextEncoder().encode(password)
   const wasmModule = await createModule({
     instantiateWasm(info, receiveInstance) {
-      const instance = new WebAssembly.Instance(wasm, info)
+      const instance = new WebAssembly.Instance(env.WASM_MODULE, info)
       receiveInstance(instance)
       return instance.exports
     },
     // locateFile(path) {
     //   if (path.endsWith('.wasm')) {
-    //     return wasm
+    //     return env.WASM_MODULE
     //   }
     //   return path
     // },
