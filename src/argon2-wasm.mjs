@@ -1,26 +1,28 @@
-import createModule from '../build/wasm-module.mjs'
+import createModule from './build/wasm-module.mjs'
+import module from './build/wasm-module.wasm'
 
 const ENCODED_HASH_BUFFER_SIZE = 1024
 
-export async function argon2id(env, t, mKiB, parallelism, password, salt, hashLength) {
+export async function argon2id(t, mKiB, parallelism, password, salt, hashLength) {
   // TODO support parallelism > 1 without threads
   if (typeof password !== 'string' || salt.BYTES_PER_ELEMENT !== 1) {
     throw new Error('invalid arguments')
   }
-  const encodedPassword = new TextEncoder().encode(password)
+
   const wasmModule = await createModule({
     instantiateWasm(info, receiveInstance) {
-      const instance = new WebAssembly.Instance(env.WASM_MODULE, info)
+      const instance = new WebAssembly.Instance(module, info)
       receiveInstance(instance)
       return instance.exports
     },
-    // locateFile(path) {
-    //   if (path.endsWith('.wasm')) {
-    //     return env.WASM_MODULE
-    //   }
-    //   return path
-    // },
+    locateFile(path, scriptDirectory) {
+      // scriptDirectory is undefined, so this is a
+      // no-op to avoid exception "TypeError: Invalid URL string."
+      return path
+    },
   })
+
+  const encodedPassword = new TextEncoder().encode(password)
   const cEncodedHash = wasmModule._malloc(ENCODED_HASH_BUFFER_SIZE)
   const result = wasmModule.ccall(
     'argon2id_hash_encoded',
