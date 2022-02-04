@@ -10,7 +10,7 @@ mkdir -p src/build
 #  -v $(pwd):/src \
 #  emscripten/emsdk:3.1.1 \
   emcc \
-  -O0 \
+  -O3 \
   -Iargon2/include \
   -o src/build/wasm-module.mjs \
   argon2/src/argon2.c argon2/src/core.c argon2/src/encoding.c argon2/src/ref.c argon2/src/thread.c \
@@ -20,7 +20,7 @@ mkdir -p src/build
   -s ENVIRONMENT=web \
   -s ERROR_ON_UNDEFINED_SYMBOLS=1 \
   -s EXIT_RUNTIME=0 \
-  -s EXPORTED_FUNCTIONS=_argon2id_hash_encoded,_argon2id_verify \
+  -s EXPORTED_FUNCTIONS=_argon2id_hash_encoded,_argon2id_verify,_malloc,_free \
   -s EXPORTED_RUNTIME_METHODS=ccall,AsciiToString \
   -s EXPORT_ES6=1 \
   -s EXPORT_NAME=createModule \
